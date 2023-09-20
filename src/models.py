@@ -85,3 +85,22 @@ class Fourier2D(nn.Module):
         return self.inner_model(fourier_features)    
         
     
+class CenteredLinearMap():
+    def __init__(self, xmin=-2.5, xmax=1.0, ymin=-1.1, ymax=1.1, x_size=None, y_size=None):
+        if x_size is not None:
+            x_m = x_size/(xmax - xmin)
+        else:
+            x_m = 1.
+        if y_size is not None:
+            y_m = y_size/(ymax - ymin)
+        else:
+            y_m = 1.
+        x_b = -(xmin + xmax)*x_m/2 - 1 
+        y_b = -(ymin + ymax)*y_m/2
+        self.m = torch.tensor([x_m, y_m], dtype = torch.float)
+        self.b = torch.tensor([x_b, y_b], dtype = torch.float)
+
+    def map(self, x):
+        m = self.m.cuda()
+        b = self.b.cuda()
+        return m*x + b

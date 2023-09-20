@@ -104,3 +104,19 @@ class CenteredLinearMap():
         m = self.m.cuda()
         b = self.b.cuda()
         return m*x + b
+
+class Taylor(nn.Module):
+    def __init__(self, taylor_order=4, hidden_size=100,num_hidden_layers = 7, linmap = None):
+        super(Taylor, self).__init__()
+        self.taylor_order = taylor_order
+        self._linmap = linmap
+        self.inner_model = SkipConn(hidden_size, num_hidden_layers, taylor_order*2 + 2)
+
+    def forward(self, x):
+        if self._linmap:
+            x = self._linmap.map(x)
+        series = [x]
+        for n in range(1, self.taylor_order + 1):
+            series.append(x**n)
+        taylor = torch.cat(series, 1)
+        return self.inner_model(taylor)

@@ -17,7 +17,8 @@ class Simple(nn.Module):
 
     def forward(self, x):
         return (self.tanh(self.seq(x))+1)/2
-    
+
+
 class SkipConn(nn.Module):
     def __init__(self, hidden_size=100, num_hidden_layers=7, init_size=2, linmap=None):
         super(SkipConn, self).__init__()

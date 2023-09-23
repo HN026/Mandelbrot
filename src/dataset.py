@@ -5,7 +5,7 @@ from torch.utils.data import Dataset
 
 device="cuda"
 
-def _m(a,max_depth):
+def _m(a,max_depth):  # This function calculates the Mandelbrot value for a given complex number a to a max depth of 'max_depth'
     z = 0
     for n in range(max_depth):
         z = z**2 + a
@@ -14,25 +14,18 @@ def _m(a,max_depth):
         
     return 1.0
 
+# This function calculates a smooth approximation of the Mandelbrot value based on the number of iterations(iters).
+# It uses a smoothness parameter to control the smoothness of the result
 def smoothMandelbrot(iters, smoothness=50):
     return (1-(1/(iters/smoothness)+1))
 
+# This function determines whether a given point is in the Mandelbrot set. 
 def mandelbrot(x,y, max_depth=50):
-    """
-    Calculates whether the given point is in the Mandelbrot set
-    
-    Parameters:
-    x(float) : real part of the number
-    y(float) : complex part of the number
-    max_depth (int) : Maximam number of recursive steps before deciding whether the value is in the Mandelbrot set
-    
-    Returns;
-    float: Number between 1 and 0 where 1 is in the Mandelbrot set and
-    values closer to 1.0 required more steps to determine this
-    """
     return _m(x+1j*y, max_depth)
 
-def mandlebrotGPT(resx, resy, xmin, xmax, ymin, ymax, max_depth):
+#This function calculates the MandelBrot set values for a grid of complex numbers within a specified region
+#of the complex plane.
+def mandelbrotGPT(resx, resy, xmin, xmax, ymin, ymax, max_depth):
     X = torch.linspace(xmin, xmax, resx, device=device, dtype=torch.float64)
     Y = torch.linspace(ymin, ymax, resy, device=device, dtype=torch.float64)
 
@@ -40,6 +33,9 @@ def mandlebrotGPT(resx, resy, xmin, xmax, ymin, ymax, max_depth):
     imag_values, real_values = torch.meshgrid(Y,X)
     return mandelbrotTensor(imag_values, real_values, max_depth)
 
+
+#This function calculates the Mandelbrot set for a grid of complex number defined by 'imag_values'
+#and real values.
 def mandelbrotTensor(imag_values, real_values, max_depth):
     #combine real and imaginary parts into a complex tensor
     c = real_values + 1j * imag_values
@@ -57,18 +53,8 @@ def mandelbrotTensor(imag_values, real_values, max_depth):
     final_image[torch.abs(z) <= 2] = 1.0 # all points that never escaped should be set to full white
     return final_image
 
+# This class is used to create a dataset of randomized points and their corresponding Mandelbrot values.
 class MandelbrotDataSet(Dataset):
-    """
-    Creates a dataset of randomized points and their calculated Mandelbrot values.
-
-    Parameters:
-    size (int) : number of randomized points to generate
-    max_depth(int): Maximum number of recursive steps before deciding whether the value is in the mandelbrot set
-    xmin (float) : minimum x value for points
-    xmax (float) : maximum x value for points
-    ymin (float) : minimum y value for points
-    ymax (float) : maximum y value for points
-    """
     def __init__(self, size=1000, loadfile=None, max_depth=50, xmin=-2.5, xmax=1.0, ymin=-1.1, ymax=1.1, dtype=torch.float32, gpu=False):
         self.inputs = []
         self.outputs = []

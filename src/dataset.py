@@ -1,6 +1,6 @@
 import torch
 import random 
-from tqdm import tqdm
+from tqdm import tqdm  # A library for displaying progress Bars
 from torch.utils.data import Dataset
 
 device="cuda"

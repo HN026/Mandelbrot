@@ -57,3 +57,42 @@ def generateLinspace(resx, resy, xmin=-2.4, xmax=1, yoffset=0):
         points = torch.stack([X, ys], 1)
         linspace.append(points)
     return torch.stack(linspace, 0)
+
+class VideoMaker:
+    def __init__(self, name='autosave', fps=30, dims=(100,100), capture_rate=10, shots=None,
+                 max_gpu=False, cmap='magma'):
+        self.name = name
+        self.dims = dims
+        self.capture_rate = capture_rate
+        self.max_gpu = max_gpu
+        self._xmin = -2.4
+        self._xmax = 1
+        self._yoffset = 0
+        self.shots = 0
+        self._yoffset = 0
+        self.shots = shots
+        self.cmap = cmap
+        self.fps = fps
+        os.makedirs(f'./frames/{self.name}', exist_ok = True)
+
+        self.linspace = generateLinspace(self.dims[0], self.dims[1], self._xmin, self._xmax, self._yoffset)
+        if max_gpu:
+            self.linspace = torch.reshape(self.linspace, (dims[0]*dims[1], 2))
+
+        self.frame_count = 0
+
+    def generateFrame (self, model):
+        if self.shots is not None and len(self.shots) > 0 and self.frame_count >= self.shots[0]['frame']:
+            shot = self.shots.pop(0)
+            self._xmin = shot["xmin"]
+            self._xmax = shot["xmax"]
+            self._yoffset = shot["yoffset"]
+            if len(shot) > 4:
+                self.capture_rate = shot["capture_rate"]
+            self.linspace = generateLinspace(self.dims[0], self.dims[1], self._xmin, self._xmax, self._yoffset)
+
+        im = renderModel(model, self.dims[0], self.dims[1], linspace=self.linspace, max_gpu = self.max_xgpu)
+        plt.imsave(f'./frames/{self.name}/{self.frame_count:05d}.png', im, cmap = self.cmap)
+
+    def generateVideo(self):
+        os.system(f'ffmpeg -y -r {self.fps} -i ./frames/{self.name}%05d.png -c:v libx264 -preset veryslow -crf 0 -pix_fmt yuv420p ./frames/{self.name}/self.name.mp4')

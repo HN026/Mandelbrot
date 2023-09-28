@@ -7,7 +7,7 @@ from src.videomaker import renderModel
 import os, sys
 
 from torch.utils.tensorboard import SummaryWriter
-from python_utils.logger import Logger
+from logger import Logger
 
 os.makedirs("./models", exist_ok = True)
 

@@ -53,7 +53,7 @@ def generateLinspace(resx, resy, xmin=-2.4, xmax=1, yoffset=0):
     Y = torch.arange(-y_max-yoffset, y_max-yoffset, iteration)[:resy]
     linspace = []
     for y in Y:
-        ys = torch.ones(len(X)).cuda() * Y
+        ys = torch.ones(len(X)).cuda() * y
         points = torch.stack([X, ys], 1)
         linspace.append(points)
     return torch.stack(linspace, 0)
@@ -91,7 +91,7 @@ class VideoMaker:
                 self.capture_rate = shot["capture_rate"]
             self.linspace = generateLinspace(self.dims[0], self.dims[1], self._xmin, self._xmax, self._yoffset)
 
-        im = renderModel(model, self.dims[0], self.dims[1], linspace=self.linspace, max_gpu = self.max_xgpu)
+        im = renderModel(model, self.dims[0], self.dims[1], linspace=self.linspace, max_gpu = self.max_gpu)
         plt.imsave(f'./frames/{self.name}/{self.frame_count:05d}.png', im, cmap = self.cmap)
 
     def generateVideo(self):

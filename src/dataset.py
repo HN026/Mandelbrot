@@ -17,7 +17,7 @@ def _m(a,max_depth):  # This function calculates the Mandelbrot value for a give
 # This function calculates a smooth approximation of the Mandelbrot value based on the number of iterations(iters).
 # It uses a smoothness parameter to control the smoothness of the result
 def smoothMandelbrot(iters, smoothness=50):
-    return (1-(1/(iters/smoothness)+1))
+    return 1-(1/((iters/smoothness)+1))
 
 # This function determines whether a given point is in the Mandelbrot set. 
 def mandelbrot(x,y, max_depth=50):
@@ -25,7 +25,7 @@ def mandelbrot(x,y, max_depth=50):
 
 #This function calculates the MandelBrot set values for a grid of complex numbers within a specified region
 #of the complex plane.
-def mandelbrotGPT(resx, resy, xmin, xmax, ymin, ymax, max_depth):
+def mandelbrotGPU(resx, resy, xmin, xmax, ymin, ymax, max_depth):
     X = torch.linspace(xmin, xmax, resx, device=device, dtype=torch.float64)
     Y = torch.linspace(ymin, ymax, resy, device=device, dtype=torch.float64)
 

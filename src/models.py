@@ -25,7 +25,7 @@ class SkipConn(nn.Module):
         out_size = hidden_size
 
         self.inLayer = nn.Linear(init_size, out_size)
-        self.relu = nn.LeakyRelu()
+        self.relu = nn.LeakyReLU()
         hidden = []
         for i in range(num_hidden_layers):
             in_size = out_size*2 + init_size if i>0 else out_size + init_size
@@ -82,7 +82,7 @@ class Fourier2D(nn.Module):
                 features.append((torch.cos(n*x[:,0])*torch.sin(m*x[:,1])).unsqueeze(-1))
                 features.append((torch.sin(n*x[:,0])*torch.cos(m*x[:,1])).unsqueeze(-1))
                 features.append((torch.sin(n*x[:,0])*torch.sin(m*x[:,1])).unsqueeze(-1))
-        fourier_features = torch.cat(features, 1)
+        fourier_features = torch.cat(features, 0)
         return self.inner_model(fourier_features)    
         
     
@@ -103,7 +103,7 @@ class CenteredLinearMap():
 
     def map(self, x):
         m = self.m.cuda()
-        b = self.b.cuda()
+        b = self.b.cuda()                                                  
         return m*x + b
 
 class Taylor(nn.Module):
